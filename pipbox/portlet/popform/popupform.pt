@@ -1,0 +1,17 @@
+<div style="display:none" tal:condition="view/target_form">
+<script>
+var popform = {};
+popform.got_cookies = null;
+popform.cookies_enabled = function(uid) {
+    if (readCookie(uid) != null) {
+        return false;
+    }
+    createCookie(uid, '1', 365);
+    return readCookie(uid) != null;
+};
+</script>
+
+    <script tal:content="structure view/jqtinit" />
+
+    <a tal:attributes="href view/form_url;id view/uid">link</a>
+</div>

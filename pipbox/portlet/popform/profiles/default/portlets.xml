@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<portlets>
+
+ <!-- Portlet type registrations -->
+
+ <portlet
+   addview="pipbox.portlet.popform.PopupForm"
+   title="Popup Form"
+   description="Timed popup configured via portlet"
+   />
+
+</portlets>

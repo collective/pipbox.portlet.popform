@@ -1,0 +1,41 @@
+Changelog
+=========
+
+1.2 (unreleased)
+----------------
+
+* Fix bad escaping of angle bracket in javascript.
+  [davisagli]
+
+1.1 (2011-12-06)
+----------------
+
+* Use plone.app.jquerytools instead of Products.pipbox.
+  [davisagli]
+
+1.0 (2010-02-18)
+----------------
+
+* Don't try to render the popup if no form is configured, or if the
+  configured form can't be found.
+
+* Use Plone's createCookie function instead of our own copy.
+  [davisagli]
+
+* Add redir_url as a class attributes on portlet assignments so that legacy
+  assignments don't break.
+  [davisagli]
+
+* Make all cookies set and checked by browser to avoid cache problems.
+  [SteveM]
+
+* Add redirect option.
+  [SteveM]
+
+* Show the form prologue and epilogue (requires PloneFormGen >= 1.5.3).
+  [davisagli]
+
+1.0a1 (2009-10-05)
+------------------
+
+* Initial release

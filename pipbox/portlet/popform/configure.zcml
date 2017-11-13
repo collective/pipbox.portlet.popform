@@ -1,0 +1,31 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="pipbox.portlet.popform">
+
+    <five:registerPackage package="." initialize=".initialize" />
+    
+    <include package="plone.app.jquerytools"/>
+
+    <genericsetup:registerProfile
+       name="default"
+       title="Popup Forms"
+       directory="profiles/default"
+       description="Timed PloneFormGen form popup configured via portlet"
+       provides="Products.GenericSetup.interfaces.EXTENSION"
+       />
+
+     <plone:portlet
+         name="pipbox.portlet.popform.PopupForm"
+         interface=".popupform.IPopupForm"
+         assignment=".popupform.Assignment"
+         view_permission="zope2.View"
+         edit_permission="cmf.ManagePortal"
+         renderer=".popupform.Renderer"
+         addview=".popupform.AddForm"
+         editview=".popupform.EditForm"
+         />
+
+</configure>
