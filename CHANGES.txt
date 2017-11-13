@@ -1,8 +1,12 @@
 Changelog
 =========
 
-1.2 (unreleased)
+2.0 (unreleased)
 ----------------
+
+* Add compatibility with Plone 5 using the plone.app.widgets modal.
+  Drop compatibility with earlier versions of Plone.
+  [davisagli]
 
 * Fix bad escaping of angle bracket in javascript.
   [davisagli]

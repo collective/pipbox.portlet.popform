@@ -1,23 +1,18 @@
-from zope.interface import implements
-from zope.component import getMultiAdapter
-
 from Acquisition import aq_inner
-
-from plone.portlets.interfaces import IPortletDataProvider
-from plone.app.portlets.portlets import base
-
-from plone.memoize.instance import memoize
-
-from zope import schema
-from zope.formlib import form
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-
+from ComputedAttribute import ComputedAttribute
 from pipbox.portlet.popform import PopupFormMessageFactory as _
-
-from plone.app.vocabularies.catalog import SearchableTextSourceBinder
-from plone.app.form.widgets.uberselectionwidget import UberSelectionWidget
-
+from plone.app.portlets.browser import formhelper
+from plone.app.portlets.portlets import base
+from plone.app.vocabularies.catalog import CatalogSource
+from plone.memoize.instance import memoize
+from plone.portlets.interfaces import IPortletDataProvider
+from Products.CMFCore.utils import getToolByName
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneFormGen.interfaces import IPloneFormGenForm
+from zExceptions import NotFound
+from zope import schema
+from zope.component import getMultiAdapter
+from zope.interface import implements
 
 pipbox_config = """
 jQuery(function($) {
@@ -47,17 +42,17 @@ class IPopupForm(IPortletDataProvider):
     same.
     """
 
-    target_form = schema.Choice(title=_(u"Target Form Folder"),
-      description=_(u"Find the form you wish to display in a popup."),
-      required=True,
-      source=SearchableTextSourceBinder(
-        {'object_provides': IPloneFormGenForm.__identifier__},
-        default_query='path:'))
+    target_form_uid = schema.Choice(title=_(u"Target Form Folder"),
+        description=_(u"Find the form you wish to display in a popup."),
+        required=True,
+        source=CatalogSource(object_provides=IPloneFormGenForm.__identifier__),
+    )
 
     display_after = schema.Int(title=_(u"Display Time"),
-      description=_(u"One-tenth seconds to wait after page load before displaying the form."),
-      required=True,
-      default=10)
+        description=_(u"One-tenth seconds to wait after page load before displaying the form."),
+        required=True,
+        default=10,
+    )
 
     width = schema.TextLine(title=_(u"Popup Width"),
         description=_(u"Width of the popup form in pixels (px) or percent (%)."),
@@ -73,12 +68,14 @@ class IPopupForm(IPortletDataProvider):
             (_(u'Close popup and refresh page'), 'reload'),
             (_(u'Redirect to specified page'), 'redirect'),
         ]),
-        default='')
+        default='',
+    )
 
     redir_url = schema.TextLine(title=_(u"Redirection Target"),
         description=_(u'If you select "redirect to" above, specify the target web address here.'),
         required=False,
-        default=u'')
+        default=u'',
+    )
 
 
 class Assignment(base.Assignment):
@@ -112,6 +109,19 @@ class Assignment(base.Assignment):
         "manage portlets" screen.
         """
         return _(u"Popup Form")
+
+    def _target_form_uid(self):
+        # This is only called if the instance doesn't have a target_form_uid
+        # attribute, which is probably because it has an old
+        # 'target_form' attribute that needs to be converted.
+        path = self.target_form
+        portal = getToolByName(self, 'portal_url').getPortalObject()
+        try:
+            form = portal.unrestrictedTraverse(path.lstrip('/'))
+        except (AttributeError, KeyError, TypeError, NotFound):
+            return
+        return form.UID()
+    target_form_uid = ComputedAttribute(_target_form_uid, 1)
 
 
 class Renderer(base.Renderer):
@@ -171,25 +181,14 @@ class Renderer(base.Renderer):
         return portal.restrictedTraverse(form_path, default=None)
 
 
-class AddForm(base.AddForm):
-    """Portlet add form.
-
-    This is registered in configure.zcml. The form_fields variable tells
-    zope.formlib which fields to display. The create() method actually
-    constructs the assignment that is being added.
-    """
-    form_fields = form.Fields(IPopupForm)
-    form_fields['target_form'].custom_widget = UberSelectionWidget
+class AddForm(formhelper.AddForm):
+    schema = IPopupForm
+    label = _(u'Add Popup Form')
 
     def create(self, data):
         return Assignment(**data)
 
 
-class EditForm(base.EditForm):
-    """Portlet edit form.
-
-    This is registered with configure.zcml. The form_fields variable tells
-    zope.formlib which fields to display.
-    """
-    form_fields = form.Fields(IPopupForm)
-    form_fields['target_form'].custom_widget = UberSelectionWidget
+class EditForm(formhelper.EditForm):
+    schema = IPopupForm
+    label = _(u'Edit Popup Form')

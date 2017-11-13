@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '1.1'
+version = '2.0.dev0'
 
 setup(name='pipbox.portlet.popform',
       version=version,
@@ -22,8 +22,8 @@ setup(name='pipbox.portlet.popform',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'Products.CMFPlone>5',
           'Products.PloneFormGen>=1.5.5',
-          'plone.app.jquerytools',
       ],
       entry_points="""
       # -*- Entry points: -*-
