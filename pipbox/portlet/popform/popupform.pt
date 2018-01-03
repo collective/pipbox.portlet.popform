@@ -1,17 +1,22 @@
 <div style="display:none" tal:condition="view/target_form">
 <script>
-var popform = {};
-popform.got_cookies = null;
-popform.cookies_enabled = function(uid) {
-    if (readCookie(uid) != null) {
-        return false;
+require(['jquery', 'jquery.cookie'], function($) {
+  var popform = {};
+  popform.got_cookies = null;
+  popform.cookies_enabled = function(uid) {
+    if ($.cookie(uid)) {
+      return false;
     }
-    createCookie(uid, '1', 365);
-    return readCookie(uid) != null;
-};
+    $.cookie(uid, '1', { expires: 365 });
+    return $.cookie(uid) !== null;
+  };
+
+  ${view/jqtinit}
+});
 </script>
 
-    <script tal:content="structure view/jqtinit" />
-
-    <a tal:attributes="href view/form_url;id view/uid">link</a>
+    <a tal:attributes="href string:${view/form_url}/fg_embedded_view_p3?show_text=1;
+                       id view/uid"
+       class="pat-plone-modal"
+       data-pat-plone-modal='{"content": ".pfg-embedded", "loadLinksWithinModal": false, "width": "${view/data/width}", "actionOptions": {"displayInModal": false} }'>link</a>
 </div>

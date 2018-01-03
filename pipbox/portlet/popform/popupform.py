@@ -1,4 +1,3 @@
-from Acquisition import aq_inner
 from ComputedAttribute import ComputedAttribute
 from pipbox.portlet.popform import PopupFormMessageFactory as _
 from plone.app.portlets.browser import formhelper
@@ -11,26 +10,14 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneFormGen.interfaces import IPloneFormGenForm
 from zExceptions import NotFound
 from zope import schema
-from zope.component import getMultiAdapter
 from zope.interface import implements
 
 pipbox_config = """
-jQuery(function($) {
-    if (popform.cookies_enabled("%s")) {
-        $('a#%s').prepOverlay({
-            subtype:'ajax',
-            urlmatch:'$',
-            urlreplace:'/fg_embedded_view_p3?show_text=1 .pfg-embedded,#content' + String.fromCharCode(62) + '*',
-            formselector:'form',
-            noform:'%s',
-            config:{closeOnClick:false},
-            width:"%s",
-            redirect:"%s"});
-        $(function(){ setTimeout( function() {
-            $("a#%s").click()}, %s);
-            });
-    }
-});
+if (popform.cookies_enabled("%s")) {
+    $(function(){ setTimeout( function() {
+        $("a#%s").click()}, %s);
+        });
+}
 """
 
 
@@ -92,12 +79,12 @@ class Assignment(base.Assignment):
     display_after = 1
 
     def __init__(self,
-                 target_form=None,
+                 target_form_uid=None,
                  display_after=1,
                  no_form='',
                  width="300px",
                  redir_url=''):
-        self.target_form = target_form
+        self.target_form_uid = target_form_uid
         self.display_after = display_after
         self.no_form = no_form
         self.width = width
@@ -154,31 +141,22 @@ class Renderer(base.Renderer):
         return pipbox_config % (
             uid,
             uid,
-            self.data.no_form,
-            self.data.width,
-            self.data.redir_url,
-            uid,
             self.delay() * 100)
 
     @memoize
     def target_form(self):
         """ get the form the portlet is pointing to"""
 
-        form_path = self.data.target_form
-        if not form_path:
+        form_uid = self.data.target_form_uid
+        if not form_uid:
             return None
 
-        if form_path.startswith('/'):
-            form_path = form_path[1:]
-
-        if not form_path:
+        catalog = getToolByName(self.context, 'portal_catalog')
+        results = catalog.searchResults(UID=form_uid)
+        if not results:
             return None
 
-        portal_state = \
-            getMultiAdapter((aq_inner(self.context), self.request),
-                            name=u'plone_portal_state')
-        portal = portal_state.portal()
-        return portal.restrictedTraverse(form_path, default=None)
+        return results[0].getObject()
 
 
 class AddForm(formhelper.AddForm):
