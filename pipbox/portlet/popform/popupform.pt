@@ -15,8 +15,8 @@ require(['jquery', 'jquery.cookie'], function($) {
 });
 </script>
 
-    <a tal:attributes="href string:${view/form_url}/fg_embedded_view_p3?show_text=1;
+    <a tal:attributes="href view/embed_url;
                        id view/uid"
        class="pat-plone-modal"
-       data-pat-plone-modal='{"content": ".pfg-embedded", "loadLinksWithinModal": false, "width": "${view/data/width}", "actionOptions": {"displayInModal": false} }'>link</a>
+       data-pat-plone-modal='{"content": ".pfg-embedded, .form", "loadLinksWithinModal": false, "width": "${view/data/width}", "actionOptions": {"displayInModal": false} }'>link</a>
 </div>

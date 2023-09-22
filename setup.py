@@ -23,7 +23,6 @@ setup(name='pipbox.portlet.popform',
       install_requires=[
           'setuptools',
           'Products.CMFPlone>5',
-          'Products.PloneFormGen>=1.5.5',
       ],
       entry_points="""
       # -*- Entry points: -*-

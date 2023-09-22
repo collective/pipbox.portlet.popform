@@ -7,7 +7,6 @@ from plone.memoize.instance import memoize
 from plone.portlets.interfaces import IPortletDataProvider
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-from Products.PloneFormGen.interfaces import IPloneFormGenForm
 from zExceptions import NotFound
 from zope import schema
 from zope.interface import implements
@@ -32,7 +31,7 @@ class IPopupForm(IPortletDataProvider):
     target_form_uid = schema.Choice(title=_(u"Target Form Folder"),
         description=_(u"Find the form you wish to display in a popup."),
         required=True,
-        source=CatalogSource(object_provides=IPloneFormGenForm.__identifier__),
+        source=CatalogSource(portal_type=['FormFolder', 'EasyForm']),
     )
 
     display_after = schema.Int(title=_(u"Display Time"),
@@ -132,6 +131,15 @@ class Renderer(base.Renderer):
             return None
         else:
             return form.absolute_url()
+
+    def embed_url(self):
+        form = self.target_form()
+        if form is None:
+            return None
+        embed_view = '/embedded'
+        if form.portal_type == 'FormFolder':
+            embed_view = '/fg_embedded_view_p3?show_text=1'
+        return form.absolute_url().rstrip('/') + embed_view
 
     def delay(self):
         return self.data.display_after
