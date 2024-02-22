@@ -4,6 +4,12 @@ Changelog
 2.0 (unreleased)
 ----------------
 
+* Add compatibility with Python 3.
+  [davisagli]
+
+* Add compatibility with collective.easyform.
+  [alecpm]
+
 * Add compatibility with Plone 5 using the plone.app.widgets modal.
   Drop compatibility with earlier versions of Plone.
   [davisagli]

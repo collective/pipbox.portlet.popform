@@ -9,7 +9,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from zExceptions import NotFound
 from zope import schema
-from zope.interface import implements
+from zope.interface import implementer
 
 pipbox_config = """
 if (popform.cookies_enabled("%s")) {
@@ -64,14 +64,13 @@ class IPopupForm(IPortletDataProvider):
     )
 
 
+@implementer(IPopupForm)
 class Assignment(base.Assignment):
     """Portlet assignment.
 
     This is what is actually managed through the portlets UI and associated
     with columns.
     """
-
-    implements(IPopupForm)
 
     redir_url = None
     target_form = None
